@@ -66,23 +66,25 @@ public class WareHouseDaoImpl implements WareHouseDao {
 	public List<Long> getProductWithColor(String color) {
 		
 		List<Rack> arrayToList = Arrays.asList(arrRacks);
-		List<Rack> rackList =arrayToList.stream().filter(c -> c.getProductColor().equals(color)).collect(Collectors.toList());
-		List<Long> listProductCode = arrayToList.stream().filter(c -> c.getProductColor().equals(color)).map(d -> d.getProductCode()).collect(Collectors.toList());
+		List<Rack> result = arrayToList.stream().filter(x -> x!=null).collect(Collectors.toList());
+		//List<Rack> rackList =result.stream().filter(c -> c.getProductColor().equals(color)).collect(Collectors.toList());
+		List<Long> listProductCode = result.stream().filter(c -> c.getProductColor().equals(color)).map(d -> d.getProductCode()).collect(Collectors.toList());
 		return listProductCode;
 	}
 
 	@Override
 	public List<Integer> getSlotFromColor(String color) {
 		List<Rack> arrayToList = Arrays.asList(arrRacks);
-		List<Rack> rackList =arrayToList.stream().filter(c -> c.getProductColor().equals(color)).collect(Collectors.toList());
-		List<Integer> listSlotNo = arrayToList.stream().filter(c -> c.getProductColor().equals(color)).map(d -> d.getSlotNo()).collect(Collectors.toList());
+		List<Rack> result = arrayToList.stream().filter(x -> x!=null).collect(Collectors.toList());
+		List<Integer> listSlotNo = result.stream().filter(c -> c.getProductColor().equals(color)).map(d -> d.getSlotNo()).collect(Collectors.toList());
 		return listSlotNo;
 	}
 
 	@Override
 	public List<Integer> getSlotFromProductCode(Long productCode) {
 		List<Rack> arrayToList = Arrays.asList(arrRacks);
-		List<Integer> SlotNo = arrayToList.stream().filter(c -> c.getProductCode() == productCode).map(d -> d.getSlotNo()).collect(Collectors.toList());
+		List<Rack> result = arrayToList.stream().filter(x -> x!=null).collect(Collectors.toList());
+		List<Integer> SlotNo = result.stream().filter(c -> c.getProductCode() == productCode).map(d -> d.getSlotNo()).collect(Collectors.toList());
 		return SlotNo;
 	}
 }
