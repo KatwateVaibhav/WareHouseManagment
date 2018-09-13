@@ -9,7 +9,8 @@ import org.springframework.stereotype.Repository;
 import com.fynd.warehouse.dao.WareHouseDao;
 import com.fynd.warehouse.dto.Rack;
 import com.fynd.warehouse.exception.RackFullException;
-import com.fynd.warehouse.main.WareHouseHelper;
+import com.fynd.warehouse.exception.SlotNotFoundException;
+import com.fynd.warehouse.helper.WareHouseHelper;
 
 @Repository
 public class WareHouseDaoImpl implements WareHouseDao {
@@ -29,30 +30,33 @@ public class WareHouseDaoImpl implements WareHouseDao {
 	}
 
 	@Override
-	public Rack[] storeProd(String product,String productColor) {
+	public Rack[] storeProd(String product, String productColor) {
 		// TODO Auto-generated method stub
-		boolean isRackEmpty= false;
+		boolean isRackEmpty = false;
 		for (int i = 0; i < arrRacks.length; i++) {
 			if (arrRacks[i] == null) {
 				System.out.println("The value at " + i + " is empty");
-				arrRacks[i] = new Rack(i, WareHouseHelper.getNext(), product, productColor);
-				isRackEmpty =true;
+				arrRacks[i] = new Rack(i, WareHouseHelper.getNext(), product.toUpperCase(), productColor.toUpperCase());
+				isRackEmpty = true;
 				break;
 			}
 		}
-		if (!isRackEmpty){
+		if (!isRackEmpty) {
 			throw new RackFullException("Rack is full !!");
 		}
 		return arrRacks;
 	}
 
-	
 	@Override
 	public Rack[] sellProduct(int sellItemFromRack) {
-		
-		System.out.println("Slot no "+ sellItemFromRack + "free");
-		 arrRacks[sellItemFromRack] = null;
-		 return arrRacks;
+
+		if (sellItemFromRack >= arrRacks.length) {
+			throw new SlotNotFoundException("Please insert valid rack number");
+		} else {
+			arrRacks[sellItemFromRack] = null;
+			System.out.println("Slot no " + sellItemFromRack + "free");
+		}
+		return arrRacks;
 	}
 
 	@Override
@@ -64,27 +68,31 @@ public class WareHouseDaoImpl implements WareHouseDao {
 
 	@Override
 	public List<Long> getProductWithColor(String color) {
-		
+
 		List<Rack> arrayToList = Arrays.asList(arrRacks);
-		List<Rack> result = arrayToList.stream().filter(x -> x!=null).collect(Collectors.toList());
-		//List<Rack> rackList =result.stream().filter(c -> c.getProductColor().equals(color)).collect(Collectors.toList());
-		List<Long> listProductCode = result.stream().filter(c -> c.getProductColor().equals(color)).map(d -> d.getProductCode()).collect(Collectors.toList());
+		List<Rack> result = arrayToList.stream().filter(x -> x != null).collect(Collectors.toList());
+		// List<Rack> rackList =result.stream().filter(c ->
+		// c.getProductColor().equals(color)).collect(Collectors.toList());
+		List<Long> listProductCode = result.stream().filter(c -> c.getProductColor().equalsIgnoreCase(color.toUpperCase()))
+				.map(d -> d.getProductCode()).collect(Collectors.toList());
 		return listProductCode;
 	}
 
 	@Override
 	public List<Integer> getSlotFromColor(String color) {
 		List<Rack> arrayToList = Arrays.asList(arrRacks);
-		List<Rack> result = arrayToList.stream().filter(x -> x!=null).collect(Collectors.toList());
-		List<Integer> listSlotNo = result.stream().filter(c -> c.getProductColor().equals(color)).map(d -> d.getSlotNo()).collect(Collectors.toList());
+		List<Rack> result = arrayToList.stream().filter(x -> x != null).collect(Collectors.toList());
+		List<Integer> listSlotNo = result.stream().filter(c -> c.getProductColor().equalsIgnoreCase(color.toUpperCase()))
+				.map(d -> d.getSlotNo()).collect(Collectors.toList());
 		return listSlotNo;
 	}
 
 	@Override
 	public List<Integer> getSlotFromProductCode(Long productCode) {
 		List<Rack> arrayToList = Arrays.asList(arrRacks);
-		List<Rack> result = arrayToList.stream().filter(x -> x!=null).collect(Collectors.toList());
-		List<Integer> SlotNo = result.stream().filter(c -> c.getProductCode() == productCode).map(d -> d.getSlotNo()).collect(Collectors.toList());
+		List<Rack> result = arrayToList.stream().filter(x -> x != null).collect(Collectors.toList());
+		List<Integer> SlotNo = result.stream().filter(c -> c.getProductCode() == productCode).map(d -> d.getSlotNo())
+				.collect(Collectors.toList());
 		return SlotNo;
 	}
 }
